@@ -1,5 +1,7 @@
 package com.test.service;
 
+import java.util.List;
+
 import org.springframework.transaction.annotation.Transactional;
 
 import com.test.dao.CustomerDao;
@@ -19,9 +21,42 @@ public class CustomerServiceImpl implements CustomerService {
 		this.customerDao = customerDao;
 	}
 
+	@Override
 	public void save(Customer customer) {
 		System.out.println("service层:保存客户...");
 		customerDao.save(customer);
+	}
+
+	/**
+	 * 更新客户
+	 */
+	@Override
+	public void update(Customer customer) {
+		customerDao.update(customer);
+	}
+
+	/**
+	 * 查询某一个客户
+	 */
+	@Override
+	public Customer getById(long l) {
+		
+		return customerDao.getById(l);
+	}
+	/**
+	 * 查询所有客户
+	 */
+	@Override
+	public List<Customer> findAll() {
+		return customerDao.findAll();
+	}
+
+	/**
+	 * 离线条件查询
+	 */
+	@Override
+	public List<Customer> findAllByQBC() {
+		return customerDao.findAllByQBC();
 	}
 
 
