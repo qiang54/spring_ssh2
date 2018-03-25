@@ -12,40 +12,74 @@
 	http://www.springframework.org/schema/aop/spring-aop.xsd
 	http://www.springframework.org/schema/tx 
 	http://www.springframework.org/schema/tx/spring-tx.xsd">
-	
-	<!-- 加载Hibernate.cfg.xm文件,property中name固定，value固定 -->
-	<bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
-		<property name="configLocation" value="classpath:hibernate.cfg.xml"></property>
+
+	<!-- c3p0连接池 -->
+	<bean id="dataSource"
+		class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		<property name="jdbcUrl" value="jdbc:mysql:///day38_ssh"></property>
+		<property name="user" value="root"></property>
+		<property name="password" value="root"></property>
 	</bean>
+
+	<!-- 加载Hibernate.cfg.xm文件,property中name固定，value固定 -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+
+		<!--数据库方言等其他配置 -->
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<prop key="hibernate.hbm2ddl.auto">update</prop>
+			</props>
+		</property>
+
+		<!-- 引入映射文件 -->
+		<property name="mappingResources">
+			<list>
+				<value>com/test/domain/Customer.hbm.xml</value>
+			</list>
+		</property>
+	</bean>
+
+
+
+
 	<!-- 事务 -->
 	<!-- 首先，平台事务管理器 -->
-	<bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
+	<bean id="transactionManager"
+		class="org.springframework.orm.hibernate5.HibernateTransactionManager">
 		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
-	
+
 	<!-- 注解方式管理事务,开启事务的注解,不要忘记在业务层加@Transactional标签 -->
-	<tx:annotation-driven transaction-manager="transactionManager"/>
-	
+	<tx:annotation-driven
+		transaction-manager="transactionManager" />
+
 	<!--配置客户模块 -->
 	<!-- 单例模式 -->
 	<!-- <bean id="customerService" class="com.test.service.CustomerServiceImpl"></bean> -->
-	
-	
-	<!-- 配置action ,必须为多例(action调用service，必须注入，ref值为私有属性的名称)-->
-	<bean id="customerAction" class="com.test.web.action.CustomerAction" scope="prototype">
+
+
+	<!-- 配置action ,必须为多例(action调用service，必须注入，ref值为私有属性的名称) -->
+	<bean id="customerAction"
+		class="com.test.web.action.CustomerAction" scope="prototype">
 		<property name="customerService" ref="customerService"></property>
 	</bean>
-	
-	<bean id="customerService" class="com.test.service.CustomerServiceImpl">
-		<property name="customerDao" ref="customerDao"/>
+
+	<bean id="customerService"
+		class="com.test.service.CustomerServiceImpl">
+		<property name="customerDao" ref="customerDao" />
 	</bean>
-	
+
 	<!-- 注入sessionFactory,获取HibernateTemplate -->
 	<bean id="customerDao" class="com.test.dao.CustomerDaoImpl">
 		<property name="sessionFactory" ref="sessionFactory"></property>
 	</bean>
 	<!-- <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate"></bean> -->
-	
+
 </beans>
 
 
